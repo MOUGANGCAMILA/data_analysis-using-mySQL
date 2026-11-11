@@ -254,3 +254,269 @@ row_number() over(partition by gender order by salary desc)
 
 
 
+
+-- cte: common table expression
+
+with cte_example as
+(
+select gender, avg(salary) avg_sal, max(salary) max_sal, min(salary) min_sal, count(salary) count_sal
+from employee_demographics dem
+join employee_salary sal
+    on dem.employee_id = sal.employee_id
+    group by gender
+)
+select avg(avg_sal)
+from cte_example
+;
+
+
+
+
+with cte_example as
+(
+select gender, avg(salary) avg_sal, max(salary) max_sal, min(salary) min_sal, count(salary) count_sal
+from employee_demographics dem
+join employee_salary sal
+    on dem.employee_id = sal.employee_id
+    group by gender
+)
+select *
+from cte_example
+;
+
+
+with cte_example as
+(
+select gender, avg(salary) avg_sal, max(salary) max_sal, min(salary) min_sal, count(salary) count_sal
+from employee_demographics dem
+join employee_salary sal
+    on dem.employee_id = sal.employee_id
+    group by gender
+)
+select avg(avg_sal)
+from cte_example
+;
+
+
+select avg(avg_sal)
+from (
+select gender, avg(salary) avg_sal, max(salary) max_sal, min(salary) min_sal, count(salary) count_sal
+from employee_demographics dem
+join employee_salary sal
+    on dem.employee_id = sal.employee_id
+    group by gender
+) example_sugquery;
+
+
+
+
+with cte_example as
+(
+select 
+from employee_demographics dem
+join employee_salary sal
+    on dem.employee_id = sal.employee_id
+    group by gender
+)
+select avg(avg_sal)
+from cte_example
+;
+
+
+
+
+
+with cte_example(Gender, AVG_Sal, NAX_Sal, MIN_Sal, COUNT_Sal) as
+(
+select gender, avg(salary) avg_sal, max(salary) max_sal, min(salary) min_sal, count(salary) count_sal
+from employee_demographics dem
+join employee_salary sal
+    on dem.employee_id = sal.employee_id
+    group by gender
+)
+select *
+from cte_example
+;
+
+
+
+--  temporary tables 
+
+
+
+create temporary table temp_table
+(first_name varchar(50),
+last_name varchar(50), 
+favorite_movie varchar(100)
+);
+
+
+select*
+from temp_table
+;
+
+insert into temp_table
+ values(
+ 'bo', 'ho', 'heba'
+ );
+ 
+ select *
+ from temp_table;
+ 
+ select  *
+ from employee_salary;
+ 
+ create temporary table salary_over_50k
+ select *
+ from employee_salary
+ where salary >= 50000;
+ 
+ select *
+ from salary_over_50k;
+ 
+
+
+-- stored procedures
+
+
+create procedure large_salaries()
+select *
+from employee_salary
+where salary >= 50000
+
+;
+
+
+call large_salaries(); 
+
+
+
+
+delimiter $$
+create procedure large_salaries2()
+begin
+	select *
+	from employee_salary
+	where salary >= 50000;
+	select *
+	from employee_salary
+	where salary >= 50000;
+end $$
+delimiter ;
+
+
+
+call large_salaries2()
+
+
+
+delimiter $$
+create procedure large_salaries3()
+begin
+	select *
+	from employee_salary
+	where salary >= 50000;
+	select *
+	from employee_salary
+	where salary >= 10000;
+end $$
+delimiter ;
+
+call large_salaries3()
+;
+
+
+delimiter $$
+create procedure large_salaries6(employee_id_param int)
+begin
+	select salary
+	from employee_salary
+    where employee_id = employee_id_param
+    ;
+end $$
+delimiter ; 
+
+
+call large_salaries6(1)
+
+;
+
+
+
+-- triggers and events
+
+select *
+from employee_demographics;
+
+select *
+from employee_salary;
+
+
+delimiter $$
+create trigger employee_insert1
+   after insert on employee_salary
+   for each row 
+begin
+     insert into employee_demographics ( employee_id, first_name, last_name )
+     values (new.employee_id, new.first_name, new.last_name );
+end $$
+delimiter ;
+
+
+insert into employee_salary (employee_id,first_name,last_name,occupation,salary,dept_id)
+values(17, 'jean mm', 'spier', 'ceo',null, null) ;
+
+
+
+select *
+from employee_salary;
+
+
+
+
+select *
+from employee_demographics;
+
+
+
+-- events
+
+delimiter $$
+create event delete_retirees
+on schedule every 30 second
+do
+begin
+	select *
+    from employee_demographics
+    where age >= 60;
+    
+end $$
+delimiter ;
+
+
+delimiter $$
+create event delete_retirees1
+on schedule every 30 second
+do
+begin
+	delete
+    from employee_demographics
+    where age >= 60;
+    
+end $$
+delimiter ;
+
+select *
+from employee_demographics;
+
+
+
+
+
+
+
+
+
+
+
+
